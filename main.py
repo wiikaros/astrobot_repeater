@@ -37,15 +37,15 @@ class repeater(Star):
         if self.repeat_target_whitelist and sender_id not in self.repeat_target_whitelist:
             return
         # 复读格式
-        if not self.repeat_target_format.get("text", True) and event.message_type == EventMessageType.TEXT:
+        if not self.repeat_target_format.get("text", True) and event.type == EventMessageType.TEXT:
             return
-        if not self.repeat_target_format.get("image", True) and event.message_type == EventMessageType.IMAGE:
+        if not self.repeat_target_format.get("image", True) and event.type == EventMessageType.IMAGE:
             return
         # 进行复读
-        if event.message_type == EventMessageType.TEXT:
+        if event.type == EventMessageType.TEXT:
             # await event.reply(event.message_str)
             await event.plain_result("文字复读: " + event.message_str)
-        elif event.message_type == EventMessageType.IMAGE:
+        elif event.type == EventMessageType.IMAGE:
             await event.image_result("图片复读: " + event.message_image)
         
 

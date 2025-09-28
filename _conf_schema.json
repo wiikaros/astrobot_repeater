@@ -1,0 +1,33 @@
+{
+    "repeat_group_whitelist": {
+        "description": "复读群聊白名单",
+        "type": "list",
+        "hint": "仅在这些群里启用复读功能，留空表示全部群聊启用",
+        "default": []
+    },
+    "repeat_target_whitelist": {
+        "description": "复读目标白名单",
+        "type": "list",
+        "hint": "仅复读这些人发的消息，留空表示复读所有人",
+        "default": []
+    },
+    "repeat_target_format": {
+        "description": "目标复读格式",
+        "type": "object",
+        "hint": "在收到什么类型的消息时进行复读",
+        "items": {
+            "text": {
+                "description": "文本格式",
+                "type": "bool",
+                "hint": "纯文本消息的复读格式",
+                "default": true
+            },
+            "image": {
+                "description": "图片格式",
+                "type": "bool",
+                "hint": "图片消息的复读格式",
+                "default": true
+            }
+        }
+    }
+}

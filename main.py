@@ -1,4 +1,4 @@
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
+from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.core import AstrBotConfig
 from astrbot.api import logger
@@ -27,7 +27,7 @@ class repeater(Star):
     async def enable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = True
         self.config.set("repeat", True)
-        yield MessageEventResult("已开启复读")
+        yield event.plain_result("已开启复读")
     
     # 关闭复读
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -35,7 +35,7 @@ class repeater(Star):
     async def disable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = False
         self.config.set("repeat", False)
-        yield MessageEventResult("已关闭复读")
+        yield event.plain_result("已关闭复读")
 
     # 查看复读配置
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -45,7 +45,7 @@ class repeater(Star):
         config_info += f"复读群聊白名单: {', '.join(self.repeat_group_whitelist) if self.repeat_group_whitelist else '无'}\n"
         config_info += f"复读对象白名单: {', '.join(self.repeat_target_whitelist) if self.repeat_target_whitelist else '无'}\n"
         config_info += f"复读格式: {', '.join([k for k, v in self.repeat_target_format.items() if v]) if self.repeat_target_format else '无'}"
-        yield MessageEventResult(config_info)
+        yield event.plain_result(config_info)
 
     # 添加复读群聊白名单
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -56,9 +56,9 @@ class repeater(Star):
         if str(group_id) not in self.repeat_group_whitelist:
             self.repeat_group_whitelist.append(str(group_id))
             self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
-            yield MessageEventResult(f"已添加群 {group_id} 到复读群聊白名单")
+            yield event.plain_result(f"已添加群 {group_id} 到复读群聊白名单")
         else:
-            yield MessageEventResult(f"群 {group_id} 已在复读群聊白名单中")
+            yield event.plain_result(f"群 {group_id} 已在复读群聊白名单中")
 
     # 移除复读群聊白名单
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -69,44 +69,44 @@ class repeater(Star):
         if str(group_id) in self.repeat_group_whitelist:
             self.repeat_group_whitelist.remove(str(group_id))
             self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
-            yield MessageEventResult(f"已移除群 {group_id} 从复读群聊白名单")
+            yield event.plain_result(f"已移除群 {group_id} 从复读群聊白名单")
         else:
-            yield MessageEventResult(f"群 {group_id} 不在复读群聊白名单中")
+            yield event.plain_result(f"群 {group_id} 不在复读群聊白名单中")
 
     # 添加复读对象白名单
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("添加复读目标")
     async def add_target_whitelist(self, event: AstrMessageEvent, target_id: str = None):
         if target_id is None:
-            yield MessageEventResult("请提供要添加到复读目标白名单的用户ID")
+            yield event.plain_result("请提供要添加到复读目标白名单的用户ID")
             return
         if str(target_id) not in self.repeat_target_whitelist:
             self.repeat_target_whitelist.append(str(target_id))
             self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
-            yield MessageEventResult(f"已添加用户 {target_id} 到复读目标白名单")
+            yield event.plain_result(f"已添加用户 {target_id} 到复读目标白名单")
         else:
-            yield MessageEventResult(f"用户 {target_id} 已在复读目标白名单中")
+            yield event.plain_result(f"用户 {target_id} 已在复读目标白名单中")
 
     # 移除复读对象白名单
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("移除复读目标")
     async def remove_target_whitelist(self, event: AstrMessageEvent, target_id: str = None):
         if target_id is None:
-            yield MessageEventResult("请提供要从复读目标白名单中移除的用户ID")
+            yield event.plain_result("请提供要从复读目标白名单中移除的用户ID")
             return
         if str(target_id) in self.repeat_target_whitelist:
             self.repeat_target_whitelist.remove(str(target_id))
             self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
-            yield MessageEventResult(f"已移除用户 {target_id} 从复读目标白名单")
+            yield event.plain_result(f"已移除用户 {target_id} 从复读目标白名单")
         else:
-            yield MessageEventResult(f"用户 {target_id} 不在复读目标白名单中")
+            yield event.plain_result(f"用户 {target_id} 不在复读目标白名单中")
 
     # 设置复读格式
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("设置复读格式")
     async def set_repeat_format(self, event: AstrMessageEvent, format: str = None):
         if format is None:
-            yield MessageEventResult("请提供复读格式，格式选项包括: 文本, 图片, 全部")
+            yield event.plain_result("请提供复读格式，格式选项包括: 文本, 图片, 全部")
             return
         if format == "文本":
             self.repeat_target_format["text"] = True
@@ -118,10 +118,10 @@ class repeater(Star):
             self.repeat_target_format["text"] = True
             self.repeat_target_format["image"] = True
         else:
-            yield MessageEventResult("无效的复读格式选项，请选择: 文本, 图片, 全部")
+            yield event.plain_result("无效的复读格式选项，请选择: 文本, 图片, 全部")
             return
         self.config.set("repeat_target_format", self.repeat_target_format)
-        yield MessageEventResult(f"已设置复读格式: {', '.join([f for f in ['文本', '图片'] if self.repeat_target_format.get(f.lower(), False)]) if self.repeat_target_format else '无'}")
+        yield event.plain_result(f"已设置复读格式: {', '.join([f for f in ['文本', '图片'] if self.repeat_target_format.get(f.lower(), False)]) if self.repeat_target_format else '无'}")
 
     # 显示帮助
     @filter.command("复读帮助")
@@ -139,7 +139,7 @@ class repeater(Star):
             "   - 设置复读格式 [文本/图片/全部]: 设置机器人复读的消息类型\n"
             "2. 只有在开启复读功能且满足白名单条件的情况下，机器人才会进行复读。"
         )
-        yield MessageEventResult(help_text)
+        yield event.plain_result(help_text)
 
     # 复读处理
     @filter.event_message_type(EventMessageType.GROUP_MESSAGE)

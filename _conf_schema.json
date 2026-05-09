@@ -1,4 +1,10 @@
 {
+    "repeat": {
+        "description": "是否启用复读功能",
+        "type": "bool",
+        "hint": "开启后机器人会复读消息",
+        "default": true
+    },
     "repeat_group_whitelist": {
         "description": "复读群聊白名单",
         "type": "list",

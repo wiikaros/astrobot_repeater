@@ -1,5 +1,6 @@
 name: astrobot_repeater # 这是你的插件的唯一识别名。
+display_name: 复读机 # 这是你的插件的显示名称，可以包含空格和特殊字符。
 desc: 复读某人的消息。 # 插件简短描述
 version: v1.0 # 插件版本号。格式：v1.1.1 或者 v1.1
 author: wiikaros # 作者
-repo: https://github.com/Synapseeeee/astrobot_repeater # 插件的仓库地址
+repo: https://github.com/wiikaros/astrobot_repeater # 插件的仓库地址

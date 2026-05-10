@@ -9,6 +9,7 @@ import astrbot.api.message_components as Comp
 class repeater(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
+        self.config = config
         self.repeat_enabled = config.get("repeat", True)  # 是否启用复读功能
         self.repeat_group_whitelist = config.get("repeat_group_whitelist", [])  # 允许复读的群组列表
         self.repeat_target_whitelist = config.get("repeat_target_whitelist", [])  # 允许复读的对象列表
@@ -27,6 +28,7 @@ class repeater(Star):
     async def enable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = True
         self.config.set("repeat", True)
+        self.config.save_config()  # 保存配置到文件
         yield event.plain_result("已开启复读")
     
     # 关闭复读
@@ -35,6 +37,7 @@ class repeater(Star):
     async def disable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = False
         self.config.set("repeat", False)
+        self.config.save_config()  # 保存配置到文件
         yield event.plain_result("已关闭复读")
 
     # 查看复读配置
@@ -52,10 +55,12 @@ class repeater(Star):
     @filter.command("添加复读群聊")
     async def add_group_whitelist(self, event: AstrMessageEvent, group_id: str = None):
         if group_id is None:
+            # 如果没有提供群ID，默认使用当前消息所在的群ID
             group_id = event.get_group_id()
         if str(group_id) not in self.repeat_group_whitelist:
             self.repeat_group_whitelist.append(str(group_id))
             self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
+            self.config.save_config()
             yield event.plain_result(f"已添加群 {group_id} 到复读群聊白名单")
         else:
             yield event.plain_result(f"群 {group_id} 已在复读群聊白名单中")
@@ -69,6 +74,7 @@ class repeater(Star):
         if str(group_id) in self.repeat_group_whitelist:
             self.repeat_group_whitelist.remove(str(group_id))
             self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
+            self.config.save_config()
             yield event.plain_result(f"已移除群 {group_id} 从复读群聊白名单")
         else:
             yield event.plain_result(f"群 {group_id} 不在复读群聊白名单中")
@@ -83,6 +89,7 @@ class repeater(Star):
         if str(target_id) not in self.repeat_target_whitelist:
             self.repeat_target_whitelist.append(str(target_id))
             self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
+            self.config.save_config()
             yield event.plain_result(f"已添加用户 {target_id} 到复读目标白名单")
         else:
             yield event.plain_result(f"用户 {target_id} 已在复读目标白名单中")
@@ -97,6 +104,7 @@ class repeater(Star):
         if str(target_id) in self.repeat_target_whitelist:
             self.repeat_target_whitelist.remove(str(target_id))
             self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
+            self.config.save_config()
             yield event.plain_result(f"已移除用户 {target_id} 从复读目标白名单")
         else:
             yield event.plain_result(f"用户 {target_id} 不在复读目标白名单中")
@@ -121,7 +129,8 @@ class repeater(Star):
             yield event.plain_result("无效的复读格式选项，请选择: 文本, 图片, 全部")
             return
         self.config.set("repeat_target_format", self.repeat_target_format)
-        yield event.plain_result(f"已设置复读格式: {', '.join([f for f in ['文本', '图片'] if self.repeat_target_format.get(f.lower(), False)]) if self.repeat_target_format else '无'}")
+        self.config.save_config()
+        yield event.plain_result(f"已设置复读格式: {', '.join([f for f in ['text', 'image'] if self.repeat_target_format.get(f.lower(), False)]) if self.repeat_target_format else '无'}")
 
     # 显示帮助
     @filter.command("复读帮助")

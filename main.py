@@ -27,8 +27,7 @@ class repeater(Star):
     @filter.command("开启复读")
     async def enable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = True
-        self.config.set("repeat", True)
-        self.config.save_config()  # 保存配置到文件
+        self.config.__setattr__("repeat", True)
         yield event.plain_result("已开启复读")
     
     # 关闭复读
@@ -36,8 +35,7 @@ class repeater(Star):
     @filter.command("关闭复读")
     async def disable_repeater(self, event: AstrMessageEvent):
         self.repeat_enabled = False
-        self.config.set("repeat", False)
-        self.config.save_config()  # 保存配置到文件
+        self.config.__setattr__("repeat", False)
         yield event.plain_result("已关闭复读")
 
     # 查看复读配置
@@ -59,8 +57,7 @@ class repeater(Star):
             group_id = event.get_group_id()
         if str(group_id) not in self.repeat_group_whitelist:
             self.repeat_group_whitelist.append(str(group_id))
-            self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
-            self.config.save_config()
+            self.config.__setattr__("repeat_group_whitelist", self.repeat_group_whitelist)
             yield event.plain_result(f"已添加群 {group_id} 到复读群聊白名单")
         else:
             yield event.plain_result(f"群 {group_id} 已在复读群聊白名单中")
@@ -73,8 +70,7 @@ class repeater(Star):
             group_id = event.get_group_id()
         if str(group_id) in self.repeat_group_whitelist:
             self.repeat_group_whitelist.remove(str(group_id))
-            self.config.set("repeat_group_whitelist", self.repeat_group_whitelist)
-            self.config.save_config()
+            self.config.__setattr__("repeat_group_whitelist", self.repeat_group_whitelist)
             yield event.plain_result(f"已移除群 {group_id} 从复读群聊白名单")
         else:
             yield event.plain_result(f"群 {group_id} 不在复读群聊白名单中")
@@ -88,8 +84,7 @@ class repeater(Star):
             return
         if str(target_id) not in self.repeat_target_whitelist:
             self.repeat_target_whitelist.append(str(target_id))
-            self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
-            self.config.save_config()
+            self.config.__setattr__("repeat_target_whitelist", self.repeat_target_whitelist)
             yield event.plain_result(f"已添加用户 {target_id} 到复读目标白名单")
         else:
             yield event.plain_result(f"用户 {target_id} 已在复读目标白名单中")
@@ -103,8 +98,7 @@ class repeater(Star):
             return
         if str(target_id) in self.repeat_target_whitelist:
             self.repeat_target_whitelist.remove(str(target_id))
-            self.config.set("repeat_target_whitelist", self.repeat_target_whitelist)
-            self.config.save_config()
+            self.config.__setattr__("repeat_target_whitelist", self.repeat_target_whitelist)
             yield event.plain_result(f"已移除用户 {target_id} 从复读目标白名单")
         else:
             yield event.plain_result(f"用户 {target_id} 不在复读目标白名单中")
@@ -128,8 +122,7 @@ class repeater(Star):
         else:
             yield event.plain_result("无效的复读格式选项，请选择: 文本, 图片, 全部")
             return
-        self.config.set("repeat_target_format", self.repeat_target_format)
-        self.config.save_config()
+        self.config.__setattr__("repeat_target_format", self.repeat_target_format)
         yield event.plain_result(f"已设置复读格式: {', '.join([f for f in ['text', 'image'] if self.repeat_target_format.get(f.lower(), False)]) if self.repeat_target_format else '无'}")
 
     # 显示帮助
@@ -138,14 +131,14 @@ class repeater(Star):
         help_text = (
             "复读插件使用说明:\n"
             "1. 管理员可以使用以下命令管理复读功能:\n"
-            "   - 开启复读: 开启复读功能\n"
-            "   - 关闭复读: 关闭复读功能\n"
-            "   - 复读配置: 查看当前复读配置\n"
-            "   - 添加复读群聊 [群ID]: 将指定群添加到复读群聊白名单（不提供群ID则默认添加当前群）\n"
-            "   - 移除复读群聊 [群ID]: 将指定群从复读群聊白名单中移除（不提供群ID则默认移除当前群）\n"
-            "   - 添加复读目标 [用户ID]: 将指定用户添加到复读目标白名单\n"
-            "   - 移除复读目标 [用户ID]: 将指定用户从复读目标白名单中移除\n"
-            "   - 设置复读格式 [文本/图片/全部]: 设置机器人复读的消息类型\n"
+            "   - 【开启复读】: 开启复读功能\n"
+            "   - 【关闭复读】: 关闭复读功能\n"
+            "   - 【复读配置】: 查看当前复读配置\n"
+            "   - 【添加复读群聊】 [群ID]: 将指定群添加到复读群聊白名单（不提供群ID则默认添加当前群）\n"
+            "   - 【移除复读群聊】 [群ID]: 将指定群从复读群聊白名单中移除（不提供群ID则默认移除当前群）\n"
+            "   - 【添加复读目标】 [用户ID]: 将指定用户添加到复读目标白名单\n"
+            "   - 【移除复读目标】 [用户ID]: 将指定用户从复读目标白名单中移除\n"
+            "   - 【设置复读格式】 [文本/图片/全部]: 设置机器人复读的消息类型\n"
             "2. 只有在开启复读功能且满足白名单条件的情况下，机器人才会进行复读。"
         )
         yield event.plain_result(help_text)

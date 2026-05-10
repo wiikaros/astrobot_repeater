@@ -148,6 +148,9 @@ class repeater(Star):
     async def repeat_handler(self, event: AstrMessageEvent):
         if not self.repeat_enabled:
             return
+        # 跳过指令/唤醒类消息，避免复读命令
+        if getattr(event, "is_at_or_wake_command", False):
+            return
         # 群白名单
         group_id = event.get_group_id()
         if self.repeat_group_whitelist and str(group_id) not in self.repeat_group_whitelist:
